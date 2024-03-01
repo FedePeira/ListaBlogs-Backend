@@ -1,0 +1,10 @@
+POST /api/blogs HTTP/1.1
+Host: localhost:3003
+Content-Type: application/json
+
+{
+ "title": "Segundo nuevo Blog",
+ "author": "Federico Peirano",
+ "url": "wwwwlocalhost:3003",
+ "likes": 10
+}
