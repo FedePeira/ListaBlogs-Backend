@@ -1,6 +1,7 @@
 const supertest = require('supertest')
 const helper = require('../utils/list_helper')
 const app = require('../app')
+const mongoose = require('mongoose')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
@@ -75,7 +76,7 @@ test('blog without likes is not added', async () => {
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
 })
 
-test.only('blog without url or title is not added', async () => {
+test('blog without url or title is not added', async () => {
     const newBlog = {
         author: 'Federico Peirano',
         url: 'https://federicopeirano.netlify.app',
@@ -86,4 +87,36 @@ test.only('blog without url or title is not added', async () => {
         .post('/api/blogs')
         .send(newBlog)
         .expect(400)
+})
+
+test.only('updating an existing blog object', async () => {
+    const newBlog = {
+        title: 'Curriculum in a Page',
+        author: 'Federico Peirano',
+        url: 'https://federicopeirano.netlify.app',
+        likes: 10,
+    }
+
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const blogId = response.body.id
+
+    const updatedBlog = {
+        title: 'Updated Title',
+        author: 'Updated Author',
+        url: 'https://updatedurl.com',
+        likes: 20,
+    }
+
+    await api
+        .put(`/api/blogs/${blogId}`)
+        .send(updatedBlog)
+        .expect(200)
+
+    const updatedResponse = await api.get(`/api/blogs/${blogId}`)
+    expect(updatedResponse.body).toEqual(expect.objectContaining(updatedBlog))
 })
