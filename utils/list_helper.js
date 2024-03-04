@@ -1,5 +1,7 @@
 const logger = require('./logger')
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
 const dummy = (blogs) => {
     if(blogs.length === 0) {
@@ -147,6 +149,65 @@ const initialBlogs = [
     }
 ]
 
+const initialUsers = [
+    {
+        username: 'Michael',
+        name: 'Michael Chan',
+        password: 'peira2922',
+    },
+    {
+        username: 'Edsger',
+        name: 'Edsger W. Dijkstra',
+        password: 'peira2922',
+    },
+    {
+        username: 'fedepeira',
+        name: 'Federico Peirano',
+        password: 'salainen',
+    }
+]
+
+const populateDatabase = async () => {
+    logger.info('Pushing...')
+    await Blog.deleteMany({})
+    await User.deleteMany({})
+
+    const userIds = []
+    for (const user of initialUsers) {
+        const saltRounds = 10
+        const passwordHash = await bcrypt.hash(user.password, saltRounds)
+        const userObject = new User({
+            username: user.username,
+            name: user.name,
+            password: passwordHash
+        })
+        await userObject.save()
+        userIds.push({ name: user.name, id: userObject._id })
+    }
+
+    const blogIds = []
+    for (const blog of initialBlogs) {
+        const userId = userIds.find(user => user.name === blog.author)?.id
+        if (!userId) {
+            logger.error(`No se encontró un usuario para el autor: ${blog.author}`)
+            continue
+        }
+        const blogObject = new Blog({
+            ...blog,
+            user: userId
+        })
+        await blogObject.save()
+        blogIds.push(blogObject._id)
+    }
+
+    for (const userId of userIds) {
+        const userObject = await User.findById(userId.id)
+        const userBlogs = await Blog.find({ author: userObject.name })
+        userObject.blogs = userBlogs.map(blog => blog._id)
+        await userObject.save()
+    }
+}
+
 const nonExistingId = async () => {
     const blog = new Blog({ content: 'willremovethissoon' })
     await blog.save()
@@ -159,6 +220,10 @@ const blogsInDb = async () => {
     return blogs.map(blog => blog.toJSON())
 }
 
+const usersInDb = async () => {
+    const users = await User.find({})
+    return users.map(user => user.toJSON())
+}
 
 module.exports = {
     dummy,
@@ -168,6 +233,7 @@ module.exports = {
     mostBlogs,
     mostLikes,
     blogsInDb,
+    usersInDb,
     nonExistingId,
-    initialBlogs
+    populateDatabase
 }

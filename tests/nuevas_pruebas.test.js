@@ -1,18 +1,10 @@
 const supertest = require('supertest')
 const helper = require('../utils/list_helper')
 const app = require('../app')
-const mongoose = require('mongoose')
 const api = supertest(app)
 
-const Blog = require('../models/blog')
-
 beforeEach(async () => {
-    await Blog.deleteMany({})
-
-    for (let blog of helper.initialBlogs) {
-        let blogObject = new Blog(blog)
-        await blogObject.save()
-    }
+    await helper.populateDatabase
 })
 
 test('blogs are returned as json', async () => {
