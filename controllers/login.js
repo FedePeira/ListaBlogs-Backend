@@ -2,7 +2,7 @@ const logger = require('../utils/logger')
 const jwt = require('jsonwebtoken')
 const loginRouter = require('express').Router()
 const User = require('../models/user')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 
 loginRouter.post('/', async (request, response) => {
     logger.info('POST /api/login log in')
