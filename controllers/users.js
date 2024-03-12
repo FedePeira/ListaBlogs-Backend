@@ -15,7 +15,9 @@ usersRouter.post('/', async (request, response) => {
     logger.info('POST /api/users endpoint hit')
 
     const { username, name, password } = request.body
-    logger.info('Request body: ' + request.body)
+    logger.info('---------------------------')
+    logger.info('Request body: ', request.body)
+    logger.info('---------------------------')
 
     if (password.length < 3) {
         return response.status(400).json({ error: 'password too short' })
@@ -25,6 +27,7 @@ usersRouter.post('/', async (request, response) => {
     const passwordHash = await bcrypt.hashSync(password, saltRounds)
     logger.info('Password sin hash: ' + password)
     logger.info('Password hasheada: ' + passwordHash)
+    logger.info('---------------------------')
 
     const user = new User({
         username: username,
@@ -33,6 +36,7 @@ usersRouter.post('/', async (request, response) => {
     })
 
     const savedUser = await user.save()
+    logger.info('Creation successfull: ', savedUser)
     response.status(201).json(savedUser)
 })
 

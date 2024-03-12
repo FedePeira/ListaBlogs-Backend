@@ -7,10 +7,13 @@ const bcrypt = require('bcrypt')
 loginRouter.post('/', async (request, response) => {
     logger.info('POST /api/login log in')
     const { username, password } = request.body
-    logger.info(request.body)
+    logger.info('-------------------')
+    logger.info('Request body: ', request.body)
+    logger.info('-------------------')
 
     const user = await User.findOne({ username: username })
-    logger.info(user)
+    logger.info('User: ', user)
+    logger.info('-------------------')
 
     const passwordCorrect = user === null
         ? false

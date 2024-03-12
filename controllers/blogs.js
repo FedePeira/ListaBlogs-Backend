@@ -5,13 +5,15 @@ const Blog = require('../models/blog')
 blogRouter.get('/', async (request, response) => {
     logger.info('GET /api/blogs endpoint hit')
     const blogs = await Blog.find({}).populate('user')
+    logger.info('Getting data successfull')
     response.json(blogs)
 })
 
 blogRouter.get('/:id', async (request, response) => {
-    logger.info('GET /api/blogs endpoint hit')
+    logger.info('GET /api/blogs/:id endpoint hit')
     const blog = await Blog.findById(request.params.id)
     if(blog) {
+        logger.info(`Getting ${request.params.id} successfull`)
         response.json(blog)
     } else {
         response.status(404).end()
@@ -21,9 +23,16 @@ blogRouter.get('/:id', async (request, response) => {
 blogRouter.post('/', async (request, response) => {
     logger.info('POST /api/blogs endpoint hit')
     const body = request.body
-    console.log('Request body: ' + body)
+
+    logger.info('---------------------')
+    logger.info('Request body: ', body)
+
+    logger.info('---------------------')
+
     const user = request.user
-    console.log('Token user: ' + user)
+    logger.info('Token user: ', user)
+    logger.info('---------------------')
+
     const blog = new Blog({
         title: body.title,
         author: body.author,
@@ -43,18 +52,21 @@ blogRouter.post('/', async (request, response) => {
     const savedBlog = await blog.save()
     user.blogs = user.blogs.concat(savedBlog._id)
     await user.save()
-
+    logger.info('Creation successfull: ', savedBlog)
     response.status(201).json(savedBlog)
 })
 
 blogRouter.delete('/:id', async (request, response) => {
-    console.log('DELETE /api/blogs endpoint hit')
+    logger.info('DELETE /api/blogs endpoint hit')
 
     const user = request.user
-    logger.info('Token user: ' + user)
+    logger.info('-------------------')
+    logger.info('Token user: ', user)
+    logger.info('--------------------')
 
     const blog = await Blog.findById(request.params.id)
-    logger.info('Body blog: ' + blog)
+    logger.info('Body blog: ', blog)
+    logger.info('--------------------')
 
     if (!blog) {
         return response.status(404).json({ error: 'blog not found' })
@@ -65,12 +77,17 @@ blogRouter.delete('/:id', async (request, response) => {
     }
 
     await Blog.findByIdAndDelete(request.params.id)
+    logger.info('Delete successfull')
     response.status(204).end()
 })
 
-/* No esta Actualizado */
 blogRouter.put('/:id', async (request, response) => {
+    console.log('PUT /api/blogs/:id endpoint hit')
     const body = request.body
+
+    console.log('-------------------------------')
+    console.log('Request body: ', body)
+    console.log('-------------------------------')
 
     const blog = {
         title: body.title,
@@ -80,6 +97,7 @@ blogRouter.put('/:id', async (request, response) => {
     }
 
     await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    logger.info('Update successfull: ', blog)
     response.status(200).end()
 })
 

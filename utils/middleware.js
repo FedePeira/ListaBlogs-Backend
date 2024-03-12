@@ -34,10 +34,14 @@ const errorHandler = (error, request, response, next) => {
 }
 
 const tokenExtractor = (error, request, response, next) => {
-    logger.info('tokenExtractor')
+    logger.info('--- tokenExtractor ---')
+    logger.info('-------------')
+    logger.info('Finding authorization...')
+    logger.info(authorization)
+    logger.info('-------------')
     const authorization = request.get('authorization')
-    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        request.token = authorization.substring(7)
+    if (authorization && authorization.startsWith('Bearer ')) {
+        request.token = authorization.replace('Bearer ', '')
     } else {
         request.token = null
     }
@@ -45,8 +49,13 @@ const tokenExtractor = (error, request, response, next) => {
 }
 
 const userExtractor = async  (error, request, response, next) => {
-    logger.info('userExtractor')
+    logger.info('--- userExtractor ---')
+
     const token = request.token
+    logger.info('-------------')
+    logger.info('Token: ', token)
+    logger.info('-------------')
+
     if(!token){
         logger.info('Token missing')
         return response.status(401).json({ error: 'token missing' })

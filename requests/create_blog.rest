@@ -3,8 +3,8 @@ Host: localhost:3003
 Content-Type: application/json
 
 {
- "title": "Segundo nuevo Blog",
- "author": "Federico Peirano",
+ "title": "Welcome Intro",
+ "author": "Michael Chan",
  "url": "wwwwlocalhost:3003",
  "likes": 10
 }

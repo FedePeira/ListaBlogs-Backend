@@ -1,0 +1,11 @@
+PUT /api/blogs/65e5f5a608157ff1be3cc661 HTTP/1.1
+Host: localhost:3003
+Content-Type: application/json
+
+{
+ "title": "Contenido actualizado",
+ "author": "Edsger W. Dijkstra",
+ "url": "https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf",
+ "likes": 5,
+ "user": "65e5f5a508157ff1be3cc659"
+}
