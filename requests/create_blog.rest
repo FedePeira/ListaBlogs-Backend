@@ -1,10 +1,10 @@
 POST /api/blogs HTTP/1.1
-Host: localhost:3003
+Host: localhost:3001
 Content-Type: application/json
 
 {
  "title": "Welcome Intro",
- "author": "Michael Chan",
+ "author": "Federico Peirano",
  "url": "wwwwlocalhost:3003",
  "likes": 10
 }

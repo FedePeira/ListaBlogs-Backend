@@ -37,9 +37,9 @@ const tokenExtractor = (error, request, response, next) => {
     logger.info('--- tokenExtractor ---')
     logger.info('-------------')
     logger.info('Finding authorization...')
+    const authorization = request.get('authorization')
     logger.info(authorization)
     logger.info('-------------')
-    const authorization = request.get('authorization')
     if (authorization && authorization.startsWith('Bearer ')) {
         request.token = authorization.replace('Bearer ', '')
     } else {

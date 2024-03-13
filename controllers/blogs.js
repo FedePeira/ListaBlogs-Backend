@@ -1,6 +1,23 @@
 const logger = require('../utils/logger')
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const jwt = require('jsonwebtoken')
+
+const getTokenFrom = request => {
+    logger.info(request.get('authorization'))
+    const authorization = request.get('authorization')
+    logger.info('-------------')
+    logger.info('Finding authorization...')
+    logger.info(authorization)
+    logger.info('-------------')
+    logger.info(authorization && authorization.startsWith('Bearer '))
+    if (authorization && authorization.startsWith('Bearer ')) {
+        logger.info(authorization.replace('Bearer ', ''))
+        return authorization.replace('Bearer ', '')
+    }
+    return null
+}
 
 blogRouter.get('/', async (request, response) => {
     logger.info('GET /api/blogs endpoint hit')
@@ -21,17 +38,33 @@ blogRouter.get('/:id', async (request, response) => {
 })
 
 blogRouter.post('/', async (request, response) => {
+    logger.info('---------------------')
     logger.info('POST /api/blogs endpoint hit')
     const body = request.body
 
     logger.info('---------------------')
     logger.info('Request body: ', body)
-
     logger.info('---------------------')
 
-    const user = request.user
-    logger.info('Token user: ', user)
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
     logger.info('---------------------')
+    logger.info('Token: ', decodedToken)
+    logger.info('---------------------')
+    if(!decodedToken){
+        logger.info('Token missing')
+        return response.status(401).json({ error: 'token missing' })
+    }
+
+    if(!decodedToken.id){
+        logger.error('Token invalid')
+        return response.status(401).json({ error: 'token invalid' })
+    }
+
+    const user = await User.findById(decodedToken.id)
+    if (!user) {
+        logger.error('User not found')
+        return response.status(404).json({ error: 'user not found' })
+    }
 
     const blog = new Blog({
         title: body.title,
@@ -57,12 +90,28 @@ blogRouter.post('/', async (request, response) => {
 })
 
 blogRouter.delete('/:id', async (request, response) => {
+    logger.info('---------------------')
     logger.info('DELETE /api/blogs endpoint hit')
 
-    const user = request.user
-    logger.info('-------------------')
-    logger.info('Token user: ', user)
-    logger.info('--------------------')
+    const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+    logger.info('---------------------')
+    logger.info('Token: ', decodedToken)
+    logger.info('---------------------')
+    if(decodedToken === undefined){
+        logger.error('Token missing')
+        return response.status(401).json({ error: 'token missing' })
+    }
+
+    if(!decodedToken.id){
+        logger.error('Token invalid')
+        return response.status(401).json({ error: 'token invalid' })
+    }
+
+    const user = await User.findById(decodedToken.id)
+    if (!user) {
+        logger.error('User not found')
+        return response.status(404).json({ error: 'user not found' })
+    }
 
     const blog = await Blog.findById(request.params.id)
     logger.info('Body blog: ', blog)
