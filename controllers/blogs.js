@@ -21,7 +21,7 @@ const getTokenFrom = request => {
 
 blogRouter.get('/', async (request, response) => {
     logger.info('GET /api/blogs endpoint hit')
-    const blogs = await Blog.find({}).populate('user')
+    const blogs = await Blog.find({}).populate('user').populate('comments')
     logger.info('Getting data successfull')
     response.json(blogs)
 })
@@ -149,5 +149,7 @@ blogRouter.put('/:id', async (request, response) => {
     logger.info('Update successfull: ', blog)
     response.status(200).end()
 })
+
+blogRouter.use('/:blogId/comments', require('./comments'))
 
 module.exports = blogRouter
