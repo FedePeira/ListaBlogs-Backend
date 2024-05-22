@@ -24,6 +24,12 @@ mongoose.connect(config.MONGODB_URI)
         logger.error('error connecting to MongoDB:', error.message)
     })
 
+const corsOptions = {
+    origin: 'https://listablogspeira.netlify.app',
+    optionsSuccessStatus: 200
+}
+
+app.use(cors(corsOptions))
 app.use(cors())
 app.use(express.static('dist'))
 app.use(express.json())
